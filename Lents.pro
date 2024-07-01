@@ -9,14 +9,22 @@ CONFIG += c++17
 #DEFINES += QT_DISABLE_DEPRECATED_BEFORE=0x060000    # disables all the APIs deprecated before Qt 6.0.0
 
 SOURCES += \
+    lentelem.cpp \
     main.cpp \
-    mainwindow.cpp
+    mainwindow.cpp \
+    newselem.cpp \
+    postclass.cpp
 
 HEADERS += \
-    mainwindow.h
+    lentelem.h \
+    mainwindow.h \
+    newselem.h \
+    postclass.h
 
 FORMS += \
-    mainwindow.ui
+    lentelem.ui \
+    mainwindow.ui \
+    newselem.ui
 
 # Default rules for deployment.
 qnx: target.path = /tmp/$${TARGET}/bin
