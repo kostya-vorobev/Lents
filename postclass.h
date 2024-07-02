@@ -1,25 +1,26 @@
 #ifndef POSTCLASS_H
 #define POSTCLASS_H
 #include <string>
+#include <QString>
 
 class PostClass
 {
 protected:
-    std::string author;
-    std::string postText;
+    QString author;
+    QString postText;
     int countLike;
     int countDislike;
 public:
-    PostClass(const std::string& author, const std::string& postText, int countLike, int countDislike);
+    PostClass(const QString& author, const QString& postText, int countLike, int countDislike);
     // Геттеры
-    std::string getAuthor();
-    std::string getPostText();
+    QString getAuthor();
+    QString getPostText();
     int getCountLike();
     int getCountDislike();
 
     // Сеттеры
-    void setAuthor(const std::string& author);
-    void setPostText(const std::string& postText);
+    void setAuthor(const QString& author);
+    void setPostText(const QString& postText);
     void setCountLike(int countLike);
     void setCountDislike(int countDislike);
 

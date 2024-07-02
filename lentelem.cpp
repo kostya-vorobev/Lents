@@ -7,8 +7,8 @@ LentElem::LentElem(PostClass* post, QWidget *parent)
     , post(post)
 {
     ui->setupUi(this);
-    ui->AuthorL->setText(QString::fromStdString(post->getAuthor()));
-    ui->TextPostL->setText(QString::fromStdString(post->getPostText()));
+    ui->AuthorL->setText(post->getAuthor());
+    ui->TextPostL->setText(post->getPostText());
     ui->LikeL->setText(QString::number(post->getCountLike()));
     ui->DislikeL->setText(QString::number(post->getCountDislike()));
 }

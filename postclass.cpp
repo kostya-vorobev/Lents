@@ -1,17 +1,17 @@
 #include "postclass.h"
 
-PostClass::PostClass(const std::string& author, const std::string& postText, int countLike, int countDislike)
+PostClass::PostClass(const QString& author, const QString& postText, int countLike, int countDislike)
     : author(author), postText(postText), countLike(countLike), countDislike(countDislike) {}
 
 // Геттеры
-std::string PostClass::getAuthor()  { return author; }
-std::string PostClass::getPostText()  { return postText; }
+QString PostClass::getAuthor()  { return author; }
+QString PostClass::getPostText()  { return postText; }
 int PostClass::getCountLike()  { return countLike; }
 int PostClass::getCountDislike()  { return countDislike; }
 
 // Сеттеры
-void PostClass::setAuthor(const std::string& author) { this->author = author; }
-void PostClass::setPostText(const std::string& postText) { this->postText = postText; }
+void PostClass::setAuthor(const QString& author) { this->author = author; }
+void PostClass::setPostText(const QString& postText) { this->postText = postText; }
 void PostClass::setCountLike(int countLike) { this->countLike = countLike; }
 void PostClass::setCountDislike(int countDislike) { this->countDislike = countDislike; }
 

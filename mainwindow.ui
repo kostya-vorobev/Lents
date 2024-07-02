@@ -36,6 +36,7 @@
      <number>1</number>
     </property>
     <widget class="QWidget" name="LentPage"/>
+    <widget class="QWidget" name="CreatePostPage"/>
     <widget class="QWidget" name="TestsPage"/>
    </widget>
    <widget class="QWidget" name="horizontalLayoutWidget">
@@ -54,12 +55,30 @@
      <property name="sizeConstraint">
       <enum>QLayout::SizeConstraint::SetDefaultConstraint</enum>
      </property>
-     <item alignment="Qt::AlignmentFlag::AlignLeft">
+     <property name="leftMargin">
+      <number>2</number>
+     </property>
+     <property name="topMargin">
+      <number>2</number>
+     </property>
+     <property name="rightMargin">
+      <number>2</number>
+     </property>
+     <property name="bottomMargin">
+      <number>2</number>
+     </property>
+     <item>
       <widget class="QPushButton" name="pushButton_2">
        <property name="minimumSize">
         <size>
-         <width>80</width>
-         <height>0</height>
+         <width>84</width>
+         <height>24</height>
+        </size>
+       </property>
+       <property name="maximumSize">
+        <size>
+         <width>84</width>
+         <height>24</height>
         </size>
        </property>
        <property name="text">
@@ -67,8 +86,45 @@
        </property>
       </widget>
      </item>
-     <item alignment="Qt::AlignmentFlag::AlignLeft">
+     <item>
+      <widget class="QPushButton" name="pushButton_4">
+       <property name="sizePolicy">
+        <sizepolicy hsizetype="Minimum" vsizetype="Fixed">
+         <horstretch>0</horstretch>
+         <verstretch>0</verstretch>
+        </sizepolicy>
+       </property>
+       <property name="minimumSize">
+        <size>
+         <width>90</width>
+         <height>24</height>
+        </size>
+       </property>
+       <property name="maximumSize">
+        <size>
+         <width>90</width>
+         <height>24</height>
+        </size>
+       </property>
+       <property name="text">
+        <string>Создать запись</string>
+       </property>
+      </widget>
+     </item>
+     <item>
       <widget class="QPushButton" name="pushButton">
+       <property name="minimumSize">
+        <size>
+         <width>84</width>
+         <height>24</height>
+        </size>
+       </property>
+       <property name="maximumSize">
+        <size>
+         <width>84</width>
+         <height>24</height>
+        </size>
+       </property>
        <property name="text">
         <string>Тестирование</string>
        </property>

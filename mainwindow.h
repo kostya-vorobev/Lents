@@ -6,6 +6,7 @@
 #include <postclass.h>
 #include <string>
 #include <lentelem.h>
+#include <newselem.h>
 
 QT_BEGIN_NAMESPACE
 namespace Ui {
@@ -26,7 +27,11 @@ private slots:
 
     void on_pushButton_clicked();
 
+    void on_pushButton_4_clicked();
+
 private:
     Ui::MainWindow *ui;
+    void addPost(const QString& author, const QString& text, int likes, int comments, QVBoxLayout* layout);
+    void updateLayout(QWidget* widget);
 };
 #endif // MAINWINDOW_H
