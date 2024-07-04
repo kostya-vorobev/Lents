@@ -25,12 +25,24 @@
      <x>10</x>
      <y>9</y>
      <width>381</width>
-     <height>41</height>
+     <height>44</height>
     </rect>
    </property>
    <layout class="QVBoxLayout" name="verticalLayout">
     <item>
      <widget class="QLabel" name="TextL">
+      <property name="minimumSize">
+       <size>
+        <width>379</width>
+        <height>20</height>
+       </size>
+      </property>
+      <property name="maximumSize">
+       <size>
+        <width>379</width>
+        <height>20</height>
+       </size>
+      </property>
       <property name="text">
        <string>TextLabel</string>
       </property>
@@ -38,6 +50,18 @@
     </item>
     <item>
      <widget class="QLabel" name="TimeL">
+      <property name="minimumSize">
+       <size>
+        <width>379</width>
+        <height>16</height>
+       </size>
+      </property>
+      <property name="maximumSize">
+       <size>
+        <width>379</width>
+        <height>16</height>
+       </size>
+      </property>
       <property name="text">
        <string>TextLabel</string>
       </property>

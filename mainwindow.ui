@@ -33,11 +33,12 @@
      <enum>QFrame::Shadow::Plain</enum>
     </property>
     <property name="currentIndex">
-     <number>1</number>
+     <number>3</number>
     </property>
     <widget class="QWidget" name="LentPage"/>
     <widget class="QWidget" name="CreatePostPage"/>
     <widget class="QWidget" name="TestsPage"/>
+    <widget class="QWidget" name="ChatPage"/>
    </widget>
    <widget class="QWidget" name="horizontalLayoutWidget">
     <property name="geometry">
@@ -112,6 +113,31 @@
       </widget>
      </item>
      <item>
+      <widget class="QPushButton" name="pushButton_5">
+       <property name="sizePolicy">
+        <sizepolicy hsizetype="Minimum" vsizetype="Fixed">
+         <horstretch>0</horstretch>
+         <verstretch>0</verstretch>
+        </sizepolicy>
+       </property>
+       <property name="minimumSize">
+        <size>
+         <width>90</width>
+         <height>24</height>
+        </size>
+       </property>
+       <property name="maximumSize">
+        <size>
+         <width>90</width>
+         <height>24</height>
+        </size>
+       </property>
+       <property name="text">
+        <string>Тестирование</string>
+       </property>
+      </widget>
+     </item>
+     <item>
       <widget class="QPushButton" name="pushButton">
        <property name="minimumSize">
         <size>
@@ -126,7 +152,7 @@
         </size>
        </property>
        <property name="text">
-        <string>Тестирование</string>
+        <string>Чат</string>
        </property>
       </widget>
      </item>

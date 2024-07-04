@@ -26,6 +26,7 @@ HEADERS += \
     newselem.h \
     postclass.h \
     qdialogusers.h \
+    sendmessageuser.h \
     socketmanager.h \
     userchatbutton.h \
     viewmessage.h
@@ -35,6 +36,7 @@ FORMS += \
     mainwindow.ui \
     newselem.ui \
     qdialogusers.ui \
+    sendmessageuser.ui \
     userchatbutton.ui
 
 # Default rules for deployment.

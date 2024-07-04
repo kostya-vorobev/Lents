@@ -4,9 +4,10 @@
 MainWindow::MainWindow(QWidget *parent)
     : QMainWindow(parent)
     , ui(new Ui::MainWindow)
+    , socketManager(new SocketManager(this))
 {
     ui->setupUi(this);
-
+    m_username = "kosty";
     // Добавляем несколько постов
     QWidget* lentPage = new QWidget;
     QVBoxLayout* layout = new QVBoxLayout;
@@ -115,33 +116,22 @@ void MainWindow::on_pushButton_4_clicked()
 
 
 void MainWindow::checkAndUpdateChats(){
-    // Если поле поиска не пустое, не обновляем список чатов, иначе обновляем
-    if(ui->SearchChatTB->toPlainText().isEmpty()){
         requestUserChats();
-    }
 }
 
-
-
-HolodWindow::~HolodWindow()
-{
-    delete socketManager;
-    delete ui;
-}
-
-void HolodWindow::onConnected()
+void MainWindow::onConnected()
 {
     // Когда подключились к серверу, делаем запрос на чаты
     requestUserChats();
 }
 
 // Объект socketManager отправляет команду и соответствующее сообщение серверу.
-void HolodWindow::sendCommand(const QString &command, const QString &message) {
+void MainWindow::sendCommand(const QString &command, const QString &message) {
     socketManager->writeData(command, message);
 }
 
 // Эта функция выполняется при получении данных от сервера
-void HolodWindow::onReadyRead(const QByteArray &receivedData) {
+void MainWindow::onReadyRead(const QByteArray &receivedData) {
     // Выводим имя пользователя в консоль
     qDebug() << m_username;
     // Создаем новый виджет и макет для чатов
@@ -189,7 +179,7 @@ void HolodWindow::onReadyRead(const QByteArray &receivedData) {
     updateChatLayout(scrollWidget);
 }
 
-UserChatButton* HolodWindow::createChatButton(const QString &chatName, const QString &lastMessage, const QDateTime &messageTime) {
+UserChatButton* MainWindow::createChatButton(const QString &chatName, const QString &lastMessage, const QDateTime &messageTime) {
     UserChatButton *chatButton = new UserChatButton(chatName, m_username);
     chatButton->setStyleSheet(
         "QWidget {"
@@ -211,7 +201,7 @@ UserChatButton* HolodWindow::createChatButton(const QString &chatName, const QSt
     return chatButton;
 }
 
-void HolodWindow::updateSearch(const QString &newText) {
+void MainWindow::updateSearch(const QString &newText) {
     // Если поле поиска не пустое, отправляем запрос на поиск на сервер.
     if(!newText.isEmpty()){
         sendCommand("search", newText);
@@ -221,28 +211,28 @@ void HolodWindow::updateSearch(const QString &newText) {
     }
 }
 
-void HolodWindow::updateChatLayout(QWidget *widget) {
+void MainWindow::updateChatLayout(QWidget *widget) {
     QScrollArea *scrollArea = new QScrollArea;
     scrollArea->setWidgetResizable(true);
     scrollArea->setWidget(widget);
 
     // Clear current content of ChatLayout
     QLayoutItem* item;
-    while ( (item = ui->ChatLayout->takeAt(0)) ) {
+    while ( (item = ui->stackedWidget->layout()->takeAt(2)) ) {
         delete item->widget();
         delete item;
     }
 
-    ui->ChatLayout->addWidget(scrollArea);
+    ui->stackedWidget->addWidget(scrollArea);
 }
 
-void HolodWindow::requestUserChats() {
+void MainWindow::requestUserChats() {
     sendCommand("getChats", m_username);
 }
 
 
-void HolodWindow::on_SearchChatTB_textChanged()
+void MainWindow::on_pushButton_5_clicked()
 {
-    updateSearch(ui->SearchChatTB->toPlainText());
+    ui->stackedWidget->setCurrentIndex(2);
 }
 

@@ -24,13 +24,10 @@ QDialogUsers::QDialogUsers(QString username, QString usernameAuth, QWidget *pare
 
     ui->OutputArea->setStyleSheet("background-color: #fff;");
     m_socketManager->connectToServer();
-
-
 }
 
 QDialogUsers::~QDialogUsers()
 {
-
     delete ui;
 }
 
@@ -51,7 +48,6 @@ void QDialogUsers::on_pushButton_clicked()
     ui->SendMessageTB->clear();
 
     sendToServer(text, timestamp, m_usernameAuth, m_username);
-
 }
 
 void QDialogUsers::on_socketConnected()
@@ -68,10 +64,10 @@ void QDialogUsers::sendToServer(const QString& message, const QString& timestamp
     messageToSend.replace('\n', "<:LF:>");
 
     data.append("saveMessage\n");
-    data.append(sender + "\n");
-    data.append(receiver + "\n");
-    data.append(messageToSend + "\n");
-    data.append(timestamp);
+    data.append(sender.toUtf8() + "\n");
+    data.append(receiver.toUtf8() + "\n");
+    data.append(messageToSend.toUtf8() + "\n");
+    data.append(timestamp.toUtf8());
 
     m_socketManager->writeDataDialog(data);
     QScrollBar *scrollBar = ui->OutputArea->verticalScrollBar();
@@ -84,13 +80,12 @@ void QDialogUsers::requestUpdatedData()
 
     QByteArray data;
     data.append("checkNewMessages\n");
-    data.append(m_usernameAuth + "\n");
-    data.append(m_username + "\n");  // Добавьте пользователя сообщения
-    data.append(m_lastUpdateTime.toString("yyyy/MM/dd HH:mm:ss"));
+    data.append(m_usernameAuth.toUtf8() + "\n");
+    data.append(m_username.toUtf8() + "\n");
+    data.append(m_lastUpdateTime.toString("yyyy/MM/dd HH:mm:ss").toUtf8());
     qDebug() << m_lastUpdateTime.toString();
     m_socketManager->writeDataDialog(data);
 }
-
 
 void QDialogUsers::on_newDataReceived(const QByteArray& data)
 {
@@ -101,12 +96,9 @@ void QDialogUsers::on_newDataReceived(const QByteArray& data)
 
     QStringList messageParts = QString::fromUtf8(data).split('\n', Qt::SkipEmptyParts);
     qDebug() << messageParts;
-   /* if (!messageParts.isEmpty())
-        messageParts.removeFirst();*/
-    qDebug() << messageParts;
+
     for (const QString &message : messageParts) {
         qDebug() << "Processing message:" << message;
-
 
         QStringList messageDetails = message.split('|'); // | - предполагаемый разделитель в строке сообщения
         if (messageDetails.size() < 3) continue; // Если сообщение не полное, то пропустите его
@@ -142,5 +134,4 @@ void QDialogUsers::on_newDataReceived(const QByteArray& data)
     }
     QScrollBar *scrollBar = ui->OutputArea->verticalScrollBar();
     scrollBar->setValue(scrollBar->maximum());
-
 }

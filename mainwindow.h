@@ -10,6 +10,14 @@
 //chat
 #include <userchatbutton.h>
 #include <socketmanager.h>
+#include <QTcpSocket>
+#include <QByteArray>
+#include <QString>
+#include <QScrollArea>
+#include <QStringList>
+#include <QTimer>
+#include <QMap>
+
 
 QT_BEGIN_NAMESPACE
 namespace Ui {
@@ -24,6 +32,7 @@ class MainWindow : public QMainWindow
 public:
     MainWindow(QWidget *parent = nullptr);
     ~MainWindow();
+    void sendCommand(const QString& command, const QString& message);
 
 private slots:
     void on_pushButton_2_clicked();
@@ -33,9 +42,10 @@ private slots:
     void on_pushButton_4_clicked();
     //chat
     void onReadyRead(const QByteArray &receivedData);
-    void on_SearchChatTB_textChanged();
     void onConnected();
     void checkAndUpdateChats();
+
+    void on_pushButton_5_clicked();
 
 private:
     Ui::MainWindow *ui;
