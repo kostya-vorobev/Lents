@@ -1,4 +1,4 @@
-QT       += core gui
+QT       += core gui network
 
 greaterThan(QT_MAJOR_VERSION, 4): QT += widgets
 
@@ -13,18 +13,29 @@ SOURCES += \
     main.cpp \
     mainwindow.cpp \
     newselem.cpp \
-    postclass.cpp
+    postclass.cpp \
+    qdialogusers.cpp \
+    sendmessageuser.cpp \
+    socketmanager.cpp \
+    userchatbutton.cpp \
+    viewmessage.cpp
 
 HEADERS += \
     lentelem.h \
     mainwindow.h \
     newselem.h \
-    postclass.h
+    postclass.h \
+    qdialogusers.h \
+    socketmanager.h \
+    userchatbutton.h \
+    viewmessage.h
 
 FORMS += \
     lentelem.ui \
     mainwindow.ui \
-    newselem.ui
+    newselem.ui \
+    qdialogusers.ui \
+    userchatbutton.ui
 
 # Default rules for deployment.
 qnx: target.path = /tmp/$${TARGET}/bin
