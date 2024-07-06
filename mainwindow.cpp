@@ -4,10 +4,11 @@
 MainWindow::MainWindow(QWidget *parent)
     : QMainWindow(parent)
     , ui(new Ui::MainWindow)
-    , socketManager(new SocketManager(this))
+    , networkManager(new NetworkManager(this))
+    , m_timer(new QTimer(this))
 {
     ui->setupUi(this);
-    m_username = "kosty";
+    m_username = "Kostya";
     // Добавляем несколько постов
     QWidget* lentPage = new QWidget;
     QVBoxLayout* layout = new QVBoxLayout;
@@ -23,21 +24,18 @@ MainWindow::MainWindow(QWidget *parent)
     ui->stackedWidget->setCurrentIndex(0);
 
     // Устанавливаем связи между сигналами и слотами
-    connect(socketManager, SIGNAL(dataReceived(QByteArray)), this, SLOT(onReadyRead(QByteArray)));
-    connect(socketManager, SIGNAL(connected()), this, SLOT(onConnected()));
-
-    // Пытаемся подключиться к серверу при инициализации
-    socketManager->connectToServer();
-
+    connect(networkManager, &QNetworkAccessManager::finished, this, &MainWindow::onHttpFinished);
+    networkManager->connectToHost("http://localhost", 3000);
+    checkAndUpdateChats();
     // Устанавливаем таймер, который будет вызывать requestUserChats каждые 10 секунд
     m_timer->setInterval(10000);
-    connect(m_timer, SIGNAL(timeout()), this, SLOT(checkAndUpdateChats()));
+    connect(m_timer, &QTimer::timeout, this, &MainWindow::checkAndUpdateChats);
     m_timer->start();
 }
 
 MainWindow::~MainWindow()
 {
-    delete socketManager;
+    delete networkManager;
     delete ui;
 }
 
@@ -119,65 +117,52 @@ void MainWindow::checkAndUpdateChats(){
         requestUserChats();
 }
 
-void MainWindow::onConnected()
-{
-    // Когда подключились к серверу, делаем запрос на чаты
-    requestUserChats();
-}
-
-// Объект socketManager отправляет команду и соответствующее сообщение серверу.
-void MainWindow::sendCommand(const QString &command, const QString &message) {
-    socketManager->writeData(command, message);
-}
-
-// Эта функция выполняется при получении данных от сервера
-void MainWindow::onReadyRead(const QByteArray &receivedData) {
-    // Выводим имя пользователя в консоль
-    qDebug() << m_username;
-    // Создаем новый виджет и макет для чатов
-    QWidget *scrollWidget = new QWidget;
-    QVBoxLayout *scrollLayout = new QVBoxLayout(scrollWidget);
-    // Устанавливаем белый цвет фона виджета
-    scrollWidget->setStyleSheet("background-color: #fff;");
-    // Устанавливаем выравнивание элементов макета по верхнему краю
-    scrollLayout->setAlignment(Qt::AlignTop);
-
-    // Разбиваем полученные данные на составные части
-    QStringList responseParts = QString(receivedData).split("\n");
-
-    // Сохраняем все чаты в QMap
+void MainWindow::onReadyRead(const QJsonArray &jsonArray) {
     QMap<QDateTime, QPair<QString, QString>> maps;
+    // Разбиваем полученные данные на составные части
+    for (int j =0 ; j< jsonArray.size(); j++)
+     {
+        QJsonObject chat = jsonArray.at(j).toObject();
 
-    // Итерируемся по каждому чату в полученных данных
-    for (const QString &chatInfo : responseParts) {
-        // Пропускаем пустые имена
-        if (chatInfo.trimmed().isEmpty())
-            continue;
-
-        // Разбиваем информацию чата на имя пользователя и сообщение
-        QStringList chatParts = chatInfo.split("|");
-        QString chatName = chatParts[0].trimmed();
-        QString lastMessage = chatParts.size() > 2 ? chatParts[1] : "Нет сообщений";
-        QString messageTime = chatParts.size() > 2 ? chatParts[2] : "";
-        if (chatName == "") chatName = m_username;
-
+        QString chatName = QString::number(chat["receiver_id"].toDouble());
+        QString lastMessage = chat["content"].toString();
+        QString messageTime = chat["created_at"].toString();
+        QDateTime messageDateTime = QDateTime::fromString(messageTime, "yyyy-MM-ddTHH:mm:ss.zzzZ");
         // Добавляем информацию об этом чате в QMap
-        maps[QDateTime::fromString(messageTime, "yyyy/MM/dd HH:mm:ss")] = QPair<QString, QString>(chatName, lastMessage);
+        maps[messageDateTime] = QPair<QString, QString>(chatName, lastMessage);
     }
 
     // Преобразуем QMap в map из стандартной библиотеки C++
     std::map<QDateTime, QPair<QString, QString>> stdMap = maps.toStdMap();
+    qDebug() << stdMap;
+    QWidget* chatPage = new QWidget;
+    QVBoxLayout* layout = new QVBoxLayout;
+    chatPage->setLayout(layout);
 
     // Итерируемся через map и создаем кнопку для каждого чата
     for(auto i = stdMap.rbegin(); i != stdMap.rend(); i++) {
         UserChatButton *chatButton = createChatButton(i->second.first, i->second.second, i->first);
         // Добавляем чат-кнопку в макет
-        scrollLayout->addWidget(chatButton);
+        layout->addWidget(chatButton);
     }
 
-    // Обновляем макет чата с новыми виджетами-кнопками
-    updateChatLayout(scrollWidget);
+    // Создаем новый QScrollArea и устанавливаем его виджетом
+    QScrollArea *scrollArea = new QScrollArea;
+    scrollArea->setWidgetResizable(true);
+    scrollArea->setWidget(chatPage);
+
+    // Очищаем текущее содержимое layout
+    QLayoutItem* item;
+    while ( (item = ui->stackedWidget->layout()->takeAt(2)) ) {
+        delete item->widget();
+        delete item;
+    }
+
+    // Добавляем новый QScrollArea в layout
+    ui->stackedWidget->layout()->addWidget(scrollArea);
+
 }
+
 
 UserChatButton* MainWindow::createChatButton(const QString &chatName, const QString &lastMessage, const QDateTime &messageTime) {
     UserChatButton *chatButton = new UserChatButton(chatName, m_username);
@@ -201,16 +186,6 @@ UserChatButton* MainWindow::createChatButton(const QString &chatName, const QStr
     return chatButton;
 }
 
-void MainWindow::updateSearch(const QString &newText) {
-    // Если поле поиска не пустое, отправляем запрос на поиск на сервер.
-    if(!newText.isEmpty()){
-        sendCommand("search", newText);
-    } else {
-        // Если поле поиска снова стало пустым, мы обновляем список чатов
-        requestUserChats();
-    }
-}
-
 void MainWindow::updateChatLayout(QWidget *widget) {
     QScrollArea *scrollArea = new QScrollArea;
     scrollArea->setWidgetResizable(true);
@@ -227,9 +202,44 @@ void MainWindow::updateChatLayout(QWidget *widget) {
 }
 
 void MainWindow::requestUserChats() {
-    sendCommand("getChats", m_username);
+    QUrl url("http://localhost:3000/messages/conversation/1/2"); // Укажите правильный URL вашего сервера
+    QNetworkRequest request(url);
+
+    // Устанавливаем заголовок Content-Type
+    request.setHeader(QNetworkRequest::ContentTypeHeader, "application/json");
+
+    // Создаем JSON объект с командой и именем пользователя
+    QJsonObject json;
+
+    // Отправляем POST запрос
+    networkManager->get(request, QJsonDocument(json).toJson());
+
+
 }
 
+void MainWindow::onHttpFinished(QNetworkReply *reply) {
+    if (reply->error()) {
+        qDebug() << "Error:" << reply->errorString();
+        return;
+    }
+
+    QJsonDocument jsonDoc = QJsonDocument::fromJson(reply->readAll());
+
+    qDebug() << "Received JSON:" << jsonDoc.toJson(QJsonDocument::Indented);
+
+    // Получение массива из JSON-документа
+    QJsonArray jsonArray = jsonDoc.array();
+
+    // Получение элемента массива по индексу
+    QJsonObject chat = jsonArray.at(1).toObject();
+
+    qDebug() << "Chat ID:" << chat["id"];
+    qDebug() << "Sender ID:" << chat["sender_id"];
+    qDebug() << "Receiver ID:" << chat["receiver_id"];
+    qDebug() << "Content:" << chat["content"];
+    qDebug() << "time:" << chat["created_at"];
+    onReadyRead(jsonArray);
+}
 
 void MainWindow::on_pushButton_5_clicked()
 {

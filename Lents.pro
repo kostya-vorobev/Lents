@@ -12,6 +12,7 @@ SOURCES += \
     lentelem.cpp \
     main.cpp \
     mainwindow.cpp \
+    networkmanager.cpp \
     newselem.cpp \
     postclass.cpp \
     qdialogusers.cpp \
@@ -23,6 +24,7 @@ SOURCES += \
 HEADERS += \
     lentelem.h \
     mainwindow.h \
+    networkmanager.h \
     newselem.h \
     postclass.h \
     qdialogusers.h \

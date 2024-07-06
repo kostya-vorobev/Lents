@@ -9,15 +9,21 @@
 #include <newselem.h>
 //chat
 #include <userchatbutton.h>
-#include <socketmanager.h>
-#include <QTcpSocket>
 #include <QByteArray>
 #include <QString>
 #include <QScrollArea>
 #include <QStringList>
+#include <QNetworkAccessManager>
+#include <QNetworkProxy>
+#include <QNetworkReply>
+#include <QJsonValueRef>
+#include <QJsonArray>
 #include <QTimer>
 #include <QMap>
-
+#include <QJsonObject>
+#include <QJsonDocument>
+#include <networkmanager.h>
+#include <QMultiMap>
 
 QT_BEGIN_NAMESPACE
 namespace Ui {
@@ -41,20 +47,19 @@ private slots:
 
     void on_pushButton_4_clicked();
     //chat
-    void onReadyRead(const QByteArray &receivedData);
-    void onConnected();
     void checkAndUpdateChats();
-
     void on_pushButton_5_clicked();
+    void onHttpFinished(QNetworkReply *reply);
+    void onReadyRead(const QJsonArray &jsonArray);
 
 private:
     Ui::MainWindow *ui;
     void addPost(const QString& author, const QString& text, int likes, int comments, QVBoxLayout* layout);
     void updateLayout(QWidget* widget);
     //chat
-    SocketManager *socketManager;
+    NetworkManager *networkManager;
     QString m_username;
-    QTimer *m_timer = new QTimer(this);
+    QTimer *m_timer;
     void setupConnection();
     void requestUserChats();
     void updateChatLayout(QWidget *widget);
