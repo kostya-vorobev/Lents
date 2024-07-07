@@ -1,11 +1,16 @@
 #include <QMainWindow>
 #include <QVBoxLayout>
-#include "socketmanager.h"
 #include "sendmessageuser.h"
 #include <QQueue>
 #include <QTimer>
 #include <QScrollBar>
-
+#include <QNetworkAccessManager>
+#include <QNetworkReply>
+#include <networkmanager.h>
+#include <QJsonValueRef>
+#include <QJsonArray>
+#include <QJsonObject>
+#include <QJsonDocument>
 
 namespace Ui
 {
@@ -22,9 +27,10 @@ public:
 
 private slots:
     void on_pushButton_clicked();
-    void on_socketConnected();
-    void on_newDataReceived(const QByteArray& data);
+    void on_newDataReceived(const QJsonArray &jsonArray);
     void requestUpdatedData();
+    void onHttpFinished(QNetworkReply *reply);
+    //void onReadyRead(const QJsonArray &jsonArray);
 
 private:
     void sendToServer(const QString& message, const QString& timestamp, const QString& sender, const QString& receiver);
@@ -33,6 +39,8 @@ private:
     QString m_usernameAuth;
     QQueue<QByteArray> m_writeQueue;
     Ui::QDialogUsers *ui;
-    SocketManager *m_socketManager;
     QDateTime m_lastUpdateTime;
+    NetworkManager *networkManager;
+    QMap<QDateTime, QPair<QString, QString>> maps;
+
 };

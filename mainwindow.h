@@ -55,9 +55,10 @@ private slots:
 private:
     Ui::MainWindow *ui;
     void addPost(const QString& author, const QString& text, int likes, int comments, QVBoxLayout* layout);
-    void updateLayout(QWidget* widget);
+    void updateLayout(QWidget* widget, int stackLayout);
     //chat
     NetworkManager *networkManager;
+    double userID;
     QString m_username;
     QTimer *m_timer;
     void setupConnection();

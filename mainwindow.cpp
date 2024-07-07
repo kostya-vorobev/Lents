@@ -8,7 +8,8 @@ MainWindow::MainWindow(QWidget *parent)
     , m_timer(new QTimer(this))
 {
     ui->setupUi(this);
-    m_username = "Kostya";
+    m_username = "1";
+    userID = 1;
     // Добавляем несколько постов
     QWidget* lentPage = new QWidget;
     QVBoxLayout* layout = new QVBoxLayout;
@@ -19,7 +20,7 @@ MainWindow::MainWindow(QWidget *parent)
     }
 
     // Обновляем layout
-    updateLayout(lentPage);
+    updateLayout(lentPage,0);
 
     ui->stackedWidget->setCurrentIndex(0);
 
@@ -62,7 +63,7 @@ void MainWindow::addPost(const QString& author, const QString& text, int likes, 
     layout->addWidget(lentElem);
 }
 
-void MainWindow::updateLayout(QWidget* widget)
+void MainWindow::updateLayout(QWidget* widget, int stackLayout)
 {
     // Создаем новый QScrollArea и устанавливаем его виджетом
     QScrollArea *scrollArea = new QScrollArea;
@@ -71,7 +72,7 @@ void MainWindow::updateLayout(QWidget* widget)
 
     // Очищаем текущее содержимое layout
     QLayoutItem* item;
-    while ( (item = ui->stackedWidget->layout()->takeAt(0)) ) {
+    while ( (item = ui->stackedWidget->layout()->takeAt(stackLayout)) ) {
         delete item->widget();
         delete item;
     }
@@ -146,21 +147,7 @@ void MainWindow::onReadyRead(const QJsonArray &jsonArray) {
         layout->addWidget(chatButton);
     }
 
-    // Создаем новый QScrollArea и устанавливаем его виджетом
-    QScrollArea *scrollArea = new QScrollArea;
-    scrollArea->setWidgetResizable(true);
-    scrollArea->setWidget(chatPage);
-
-    // Очищаем текущее содержимое layout
-    QLayoutItem* item;
-    while ( (item = ui->stackedWidget->layout()->takeAt(2)) ) {
-        delete item->widget();
-        delete item;
-    }
-
-    // Добавляем новый QScrollArea в layout
-    ui->stackedWidget->layout()->addWidget(scrollArea);
-
+    updateLayout(chatPage, 2);
 }
 
 
@@ -186,23 +173,9 @@ UserChatButton* MainWindow::createChatButton(const QString &chatName, const QStr
     return chatButton;
 }
 
-void MainWindow::updateChatLayout(QWidget *widget) {
-    QScrollArea *scrollArea = new QScrollArea;
-    scrollArea->setWidgetResizable(true);
-    scrollArea->setWidget(widget);
-
-    // Clear current content of ChatLayout
-    QLayoutItem* item;
-    while ( (item = ui->stackedWidget->layout()->takeAt(2)) ) {
-        delete item->widget();
-        delete item;
-    }
-
-    ui->stackedWidget->addWidget(scrollArea);
-}
-
 void MainWindow::requestUserChats() {
-    QUrl url("http://localhost:3000/messages/conversation/1/2"); // Укажите правильный URL вашего сервера
+    QString urlStr = "http://localhost:3000/messages/conversation/"+ QString::number(userID) +"/2";
+    QUrl url(urlStr); // Укажите правильный URL вашего сервера
     QNetworkRequest request(url);
 
     // Устанавливаем заголовок Content-Type
