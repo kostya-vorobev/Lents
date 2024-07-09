@@ -12,6 +12,7 @@ public:
 
 protected:
     void finished(QNetworkReply *reply);
+    void postSender(QNetworkReply *reply);
 };
 
 #endif // NETWORKMANAGER_H

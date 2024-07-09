@@ -11,6 +11,7 @@ LentElem::LentElem(PostClass* post, QWidget *parent)
     ui->TextPostL->setText(post->getPostText());
     ui->LikeL->setText(QString::number(post->getCountLike()));
     ui->DislikeL->setText(QString::number(post->getCountDislike()));
+    postID = post->getID();
 }
 
 LentElem::~LentElem()

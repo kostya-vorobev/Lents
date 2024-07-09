@@ -6,6 +6,7 @@
 #include <QDateTime>
 #include <QDebug>
 #include <qdialogusers.h>
+#include <chatclass.h>
 
 namespace Ui {
 class UserChatButton;
@@ -16,7 +17,7 @@ class UserChatButton : public QWidget
     Q_OBJECT
 
 public:
-    explicit UserChatButton(QString username, QString usernameAuth, QWidget* parent = nullptr);
+    explicit UserChatButton(ChatClass* chatUnit, QWidget* parent = nullptr);
     ~UserChatButton();
 
     void setUsername(const QString& username);
@@ -37,6 +38,7 @@ private:
     Ui::UserChatButton *ui;
     QString m_username;
     QDialogUsers *m_dialogUsers = nullptr;
+    ChatClass* chatUnit;
 };
 
 #endif // USERCHATBUTTON_H

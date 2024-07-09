@@ -2,13 +2,18 @@
 #include "ui_userchatbutton.h"
 #include <QMouseEvent>
 
-UserChatButton::UserChatButton(QString username, QString usernameAuth, QWidget* parent) :
+UserChatButton::UserChatButton(ChatClass* chatUnit, QWidget* parent) :
     QWidget(parent),
-    m_username(usernameAuth),
     ui(new Ui::UserChatButton)
 {
     ui->setupUi(this);
-    setUsername(username);
+    this->chatUnit = chatUnit;
+    if (chatUnit->getId() == chatUnit->getUser1Id())
+    {
+    setUsername(chatUnit->getUser2Name());
+    }
+    else
+        setUsername(chatUnit->getUser1Name());
     connect(this, &UserChatButton::clicked, this, &UserChatButton::onClicked);
     ui->UsernameL->setStyleSheet("QLabel {"
                                  "font: bold 14px;"
@@ -55,7 +60,7 @@ void UserChatButton::onClicked()
     qDebug() << "Chat button clicked for user: " << ui->UsernameL->text();
 
     if (!m_dialogUsers) { // Если окно не открыто
-        m_dialogUsers = new QDialogUsers(ui->UsernameL->text(), m_username);
+        m_dialogUsers = new QDialogUsers(chatUnit);
         // Удалите окно при закрытии
         connect(m_dialogUsers, &QDialogUsers::destroyed, [this] { m_dialogUsers = nullptr; });
     }

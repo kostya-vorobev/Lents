@@ -15,3 +15,16 @@ void NetworkManager::finished(QNetworkReply *reply) {
     reply->deleteLater();
 }
 
+void NetworkManager::postSender(QNetworkReply *reply) {
+    if (reply->error()) {
+        qDebug() << "Error: " << reply->errorString();
+    } else {
+        QByteArray buffer;
+        buffer.append(reply->readAll());
+        QString response = QString::fromUtf8(buffer);
+        qDebug() << "Response: " << response; // Display the response in the console
+    }
+
+    reply->deleteLater();
+}
+

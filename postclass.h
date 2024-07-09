@@ -10,19 +10,22 @@ protected:
     QString postText;
     int countLike;
     int countDislike;
+    int postID;
 public:
-    PostClass(const QString& author, const QString& postText, int countLike, int countDislike);
+    PostClass(int postID, const QString& author, const QString& postText, int countLike, int countDislike);
     // Геттеры
     QString getAuthor();
     QString getPostText();
     int getCountLike();
     int getCountDislike();
+    int getID();
 
     // Сеттеры
     void setAuthor(const QString& author);
     void setPostText(const QString& postText);
     void setCountLike(int countLike);
     void setCountDislike(int countDislike);
+    void setID(int postID);
 
     // Методы для увеличения/уменьшения количества лайков и дизлайков
     void incrementLikes();

@@ -61,7 +61,7 @@
      </widget>
     </item>
     <item>
-     <widget class="QPlainTextEdit" name="plainTextEdit">
+     <widget class="QPlainTextEdit" name="postEdit">
       <property name="minimumSize">
        <size>
         <width>390</width>

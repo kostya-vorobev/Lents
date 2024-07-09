@@ -2,21 +2,21 @@
 #include "ui_qdialogusers.h"
 #include <QThread>
 
-QDialogUsers::QDialogUsers(QString username, QString usernameAuth, QWidget *parent)
+QDialogUsers::QDialogUsers(ChatClass* chatUnit, QWidget *parent)
     : QMainWindow(parent)
-    , m_username(username)
-    , m_usernameAuth(usernameAuth)
+    , m_username(chatUnit->getUser1Name())
+    , m_usernameAuth(chatUnit->getUser2Name())
     , ui(new Ui::QDialogUsers)
     , networkManager(new NetworkManager(this))
 {
     ui->setupUi(this);
-
+    this->chatUnit = chatUnit;
     ui->OutputArea->setWidget(new QWidget());
     ui->OutputArea->widget()->setLayout(new QVBoxLayout());
 
     connect(networkManager, &QNetworkAccessManager::finished, this, &QDialogUsers::onHttpFinished);
     //networkManager->connectToHost("http://localhost", 3000);
-
+    requestUpdatedData();
     QTimer *timer = new QTimer(this);
     connect(timer, &QTimer::timeout, this, &QDialogUsers::requestUpdatedData);
     timer->start(2000);
@@ -45,26 +45,32 @@ void QDialogUsers::on_pushButton_clicked()
     qDebug() << timestamp;
 
     ui->SendMessageTB->clear();
-
-    //sendToServer(text, timestamp, m_usernameAuth, m_username);
+    if(chatUnit->getId() == chatUnit->getUser1Id())
+    {
+        sendToServer(text, QString::number(chatUnit->getId()), QString::number(chatUnit->getUser2Id()));
+    }else
+    {
+        sendToServer(text, QString::number(chatUnit->getId()), QString::number(chatUnit->getUser1Id()));
+    }
 }
 
-void QDialogUsers::sendToServer(const QString& message, const QString& timestamp, const QString& sender, const QString& receiver)
+void QDialogUsers::sendToServer(const QString& message, const QString& sender, const QString& receiver)
 {
-    /*QByteArray data;
 
-    QString messageToSend = message;
-    messageToSend.replace('\n', "<:LF:>");
+    QUrl url("http://localhost:3000/messages/send");
+    QNetworkRequest request(url);
 
-    data.append("saveMessage\n");
-    data.append(sender.toUtf8() + "\n");
-    data.append(receiver.toUtf8() + "\n");
-    data.append(messageToSend.toUtf8() + "\n");
-    data.append(timestamp.toUtf8());
+    // Устанавливаем заголовок Content-Type
+    request.setHeader(QNetworkRequest::ContentTypeHeader, "application/json");
 
-    m_socketManager->writeDataDialog(data);
-    QScrollBar *scrollBar = ui->OutputArea->verticalScrollBar();
-    scrollBar->setValue(scrollBar->maximum());*/
+    // Создаем JSON объект с командой и именем пользователя
+    QJsonObject json;
+    json["content"] = message;
+    json["sender_id"] = sender;
+    json["receiver_id"] = receiver;
+
+    // Отправляем POST запрос
+    networkManager->post(request, QJsonDocument(json).toJson());
 }
 
 /*
@@ -102,6 +108,7 @@ void MainWindow::onReadyRead(const QJsonArray &jsonArray) {
 
 void QDialogUsers::on_newDataReceived(const QJsonArray &jsonArray)
 {
+    qDebug() << "1";
     if (jsonArray.isEmpty()){
         qDebug() << "No data available for reading!";
         return;
@@ -111,11 +118,12 @@ void QDialogUsers::on_newDataReceived(const QJsonArray &jsonArray)
     // Разбиваем полученные данные на составные части
     for (int j =0 ; j< jsonArray.size(); j++)
     {
-        QJsonObject chat = jsonArray.at(j).toObject();
 
-        QString chatName = QString::number(chat["receiver_id"].toDouble());
+        QJsonObject chat = jsonArray.at(j).toObject();
+        int receiver_id = chat["receiver_id"].toInt();
+        QString chatName = QString::number(chat["receiver_id"].toInt());
         QString lastMessage = chat["content"].toString();
-        QString messageTime = chat["created_at"].toString();
+        QString messageTime = chat["sent_at"].toString();
         QDateTime messageDateTime = QDateTime::fromString(messageTime, "yyyy-MM-ddTHH:mm:ss.zzzZ");
 
         if (maps.contains(messageDateTime))
@@ -130,7 +138,9 @@ void QDialogUsers::on_newDataReceived(const QJsonArray &jsonArray)
         newMessage->setTimestamp(messageDateTime.toString("yyyy-MM-dd HH:mm:ss")); // устанавливаем временную метку
 
         QHBoxLayout* messageLayout = new QHBoxLayout();
-        if(chatName == m_usernameAuth){
+        qDebug() << chatUnit->getId();
+        qDebug() << receiver_id;
+        if(chatUnit->getId() != receiver_id){
             messageLayout->addItem(new QSpacerItem(0, 0, QSizePolicy::Expanding, QSizePolicy::Minimum));
             messageLayout->addWidget(newMessage);
         }
@@ -194,7 +204,11 @@ void QDialogUsers::on_newDataReceived(const QJsonArray &jsonArray)
 }
 
 void QDialogUsers::requestUpdatedData() {
-    QString urlStr = "http://localhost:3000/messages/conversation/"+ m_username +"/"+ m_usernameAuth;
+
+    QString userID1 = QString::number(chatUnit->getUser1Id());
+    QString userID2 = QString::number(chatUnit->getUser2Id());
+    QString urlStr = "http://localhost:3000/messages/conversation/"+ userID1 +"/"+userID2;
+
     qDebug() << urlStr;
     QUrl url(urlStr); // Укажите правильный URL вашего сервера
     QNetworkRequest request(url);
@@ -222,15 +236,27 @@ void QDialogUsers::onHttpFinished(QNetworkReply *reply) {
     qDebug() << "Received JSON:" << jsonDoc.toJson(QJsonDocument::Indented);
 
     // Получение массива из JSON-документа
-    QJsonArray jsonArray = jsonDoc.array();
 
-    // Получение элемента массива по индексу
-    QJsonObject chat = jsonArray.at(1).toObject();
+    //QJsonObject jsonObjs = jsonArray.at(0).toObject();
+    //qDebug() << jsonObjs;
+    //QJsonArray jsonArray1 = jsonArray[1];
 
-    qDebug() << "Chat ID:" << chat["id"];
-    qDebug() << "Sender ID:" << chat["sender_id"];
-    qDebug() << "Receiver ID:" << chat["receiver_id"];
-    qDebug() << "Content:" << chat["content"];
-    qDebug() << "time:" << chat["created_at"];
-    on_newDataReceived(jsonArray);
+    QJsonObject jsonObj;
+    if (jsonDoc.isObject())
+    {
+        jsonObj = jsonDoc.object();
+        //jsonArray.append(jsonObj);
+    }
+
+
+    if(jsonObj["tag"] == "messages")
+    {
+        QJsonArray jsonArray = jsonObj["data"].toArray();
+        if (jsonArray.size() > 0){
+
+            //qDebug() << jsonObj["data"];
+            //qDebug() << jsonObj;
+            on_newDataReceived(jsonArray);
+        }
+    }
 }

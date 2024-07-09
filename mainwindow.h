@@ -24,6 +24,8 @@
 #include <QJsonDocument>
 #include <networkmanager.h>
 #include <QMultiMap>
+#include <QListWidget>
+#include <chatclass.h>
 
 QT_BEGIN_NAMESPACE
 namespace Ui {
@@ -51,20 +53,29 @@ private slots:
     void on_pushButton_5_clicked();
     void onHttpFinished(QNetworkReply *reply);
     void onReadyRead(const QJsonArray &jsonArray);
+    void onReadyReadPosts(const QJsonArray &jsonArray);
+
+    void on_updatePostB_clicked();
 
 private:
     Ui::MainWindow *ui;
-    void addPost(const QString& author, const QString& text, int likes, int comments, QVBoxLayout* layout);
-    void updateLayout(QWidget* widget, int stackLayout);
+    void addPost(int postID, const QString& author, const QString& text, int likes, int disLikes, QVBoxLayout* layout);
+    void updateLayout(QWidget* widget, QWidget* page);
     //chat
     NetworkManager *networkManager;
-    double userID;
+    int userID;
     QString m_username;
     QTimer *m_timer;
     void setupConnection();
     void requestUserChats();
+    void requestUserPosts();
     void updateChatLayout(QWidget *widget);
-    UserChatButton* createChatButton(const QString &chatName, const QString &lastMessage, const QDateTime &messageTime);
+    UserChatButton* createChatButton(ChatClass* chatUnit);
     void updateSearch(const QString &newText);
+    QWidget *LentPage;
+    QWidget *CreatePostPage;
+    QWidget *TestsPage;
+    QWidget *ChatPage;
+    QListWidget *list;
 };
 #endif // MAINWINDOW_H

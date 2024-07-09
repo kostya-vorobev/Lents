@@ -23,6 +23,7 @@ private slots:
 private:
     Ui::LentElem *ui;
     PostClass* post;
+    int postID;
 };
 
 #endif // LENTELEM_H

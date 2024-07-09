@@ -11,6 +11,7 @@
 #include <QJsonArray>
 #include <QJsonObject>
 #include <QJsonDocument>
+#include <chatclass.h>
 
 namespace Ui
 {
@@ -22,7 +23,7 @@ class QDialogUsers : public QMainWindow
     Q_OBJECT
 
 public:
-    explicit QDialogUsers(QString username, QString usernameAuth, QWidget *parent = nullptr);
+    explicit QDialogUsers(ChatClass* chatUnit, QWidget *parent = nullptr);
     ~QDialogUsers();
 
 private slots:
@@ -33,7 +34,7 @@ private slots:
     //void onReadyRead(const QJsonArray &jsonArray);
 
 private:
-    void sendToServer(const QString& message, const QString& timestamp, const QString& sender, const QString& receiver);
+    void sendToServer(const QString& message, const QString& sender, const QString& receiver);
 
     QString m_username;
     QString m_usernameAuth;
@@ -42,5 +43,6 @@ private:
     QDateTime m_lastUpdateTime;
     NetworkManager *networkManager;
     QMap<QDateTime, QPair<QString, QString>> maps;
+    ChatClass* chatUnit;
 
 };
