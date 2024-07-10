@@ -1,10 +1,10 @@
-#include "mainwindow.h"
-#include "ui_mainwindow.h"
+#include "auth.h"
+#include "ui_auth.h"
 #include "newlogin.h"
 
-MainWindow::MainWindow(QWidget *parent)
+Auth::Auth(QWidget *parent)
     : QMainWindow(parent)
-    , ui(new Ui::MainWindow)
+    , ui(new Ui::Auth)
 {
     ui->setupUi(this);
     QPixmap pix(":/reso/img/tg.png");
@@ -17,18 +17,18 @@ MainWindow::MainWindow(QWidget *parent)
 }
 
 
-MainWindow::~MainWindow()
+Auth::~Auth()
 {
     delete ui;
 }
 
-void MainWindow::on_tgLabel_linkActivated(const QString &link)
+void Auth::on_tgLabel_linkActivated(const QString &link)
 {
 
 }
 
 
-void MainWindow::on_pushButton_clicked()
+void Auth::on_pushButton_clicked()
 {
     newlogin log;
     log.setModal(true);

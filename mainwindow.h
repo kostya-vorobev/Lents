@@ -26,6 +26,7 @@
 #include <QMultiMap>
 #include <QListWidget>
 #include <chatclass.h>
+#include <mainwindow.h>
 
 QT_BEGIN_NAMESPACE
 namespace Ui {
@@ -38,7 +39,7 @@ class MainWindow : public QMainWindow
     Q_OBJECT
 
 public:
-    MainWindow(QWidget *parent = nullptr);
+    MainWindow(int userID, QWidget *parent = nullptr);
     ~MainWindow();
     void sendCommand(const QString& command, const QString& message);
 

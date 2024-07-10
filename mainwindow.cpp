@@ -1,15 +1,16 @@
 #include "mainwindow.h"
 #include "ui_mainwindow.h"
 
-MainWindow::MainWindow(QWidget *parent)
+MainWindow::MainWindow(int loginUserID, QWidget *parent)
     : QMainWindow(parent)
     , ui(new Ui::MainWindow)
     , networkManager(new NetworkManager(this))
     , m_timer(new QTimer(this))
+    , userID(loginUserID)
 {
     ui->setupUi(this);
     m_username = "2";
-    userID = 2;
+    //userID = 2;
 
     // Создаем 4 страницы в stackedWidget
     LentPage = ui->stackedWidget->widget(0);

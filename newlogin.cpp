@@ -1,20 +1,15 @@
 #include "newlogin.h"
 #include "ui_newlogin.h"
-#include <QCoreApplication>
-#include <QNetworkAccessManager>
-#include <QNetworkRequest>
-#include <QNetworkReply>
-#include <QJsonObject>
-#include <QJsonDocument>
-#include <QDebug>
-#include <QString>
-#include <QLineEdit>
+
 
 newlogin::newlogin(QWidget *parent)
     : QDialog(parent)
     , ui(new Ui::newlogin)
+    , networkManager(new NetworkManager(this))
 {
     ui->setupUi(this);
+
+    connect(networkManager, &QNetworkAccessManager::finished, this, &newlogin::onHttpFinished);
 }
 
 newlogin::~newlogin()
@@ -26,8 +21,9 @@ newlogin::~newlogin()
 
 void newlogin::on_pushButton_clicked()
 {
-    QNetworkAccessManager manager;
-    QNetworkRequest request(QUrl("http://localhost:3000/saveUserData"));
+
+    QUrl url("http://localhost:3000/users/add");
+    QNetworkRequest request(url);
     request.setHeader(QNetworkRequest::ContentTypeHeader, "application/json");
 
     //  данные для отправки на сервер
@@ -37,28 +33,44 @@ void newlogin::on_pushButton_clicked()
     name_str=ui->nameEdit->text();
     QJsonObject json;
 
-    json["surname"] = sur_str;
+    json["password"] = sur_str;
     json["email"] = mail_str;
-    json["nickname"] = name_str;
+    json["username"] = name_str;
 
     qDebug() << mail_str;
     qDebug() << sur_str;
     qDebug() << name_str;
 
+    networkManager->post(request, QJsonDocument(json).toJson());
 
-    QJsonDocument jsonData(json);
-    QByteArray postData = jsonData.toJson();
+}
 
-    QNetworkReply *reply = manager.post(request, postData);
+void newlogin::onHttpFinished(QNetworkReply *reply){
+    if (reply->error()) {
+        qDebug() << "Error:" << reply->errorString();
+        return;
+    }
 
-    QObject::connect(reply, &QNetworkReply::finished, [&](){
-        if (reply->error() == QNetworkReply::NoError) {
-            qDebug() << "Данные успешно отправлены";
-            qDebug() << reply->readAll(); // Вывод ответа от сервера
-        } else {
-            qDebug() << "Ошибка при отправке данных:" << reply->errorString();
-        }
-        reply->deleteLater();
-     });
+    QJsonDocument jsonDoc = QJsonDocument::fromJson(reply->readAll());
+
+    qDebug() << "Received JSON:" << jsonDoc.toJson(QJsonDocument::Indented);
+
+    QJsonObject jsonObj;
+    if (jsonDoc.isObject())
+    {
+        jsonObj = jsonDoc.object();
+    }
+
+    if(!jsonObj["id"].isNull())
+    {
+        MainWindow* mainWindow = new MainWindow(jsonObj["id"].toInt());
+        mainWindow->show();
+        this->close();
+    }
+
+
+
+
+
 }
 
