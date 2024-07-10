@@ -9,11 +9,13 @@ CONFIG += c++17
 #DEFINES += QT_DISABLE_DEPRECATED_BEFORE=0x060000    # disables all the APIs deprecated before Qt 6.0.0
 
 SOURCES += \
+    auth.cpp \
     chatclass.cpp \
     lentelem.cpp \
     main.cpp \
     mainwindow.cpp \
     networkmanager.cpp \
+    newlogin.cpp \
     newselem.cpp \
     postclass.cpp \
     qdialogusers.cpp \
@@ -22,10 +24,12 @@ SOURCES += \
     viewmessage.cpp
 
 HEADERS += \
+    auth.h \
     chatclass.h \
     lentelem.h \
     mainwindow.h \
     networkmanager.h \
+    newlogin.h \
     newselem.h \
     postclass.h \
     qdialogusers.h \
@@ -34,8 +38,10 @@ HEADERS += \
     viewmessage.h
 
 FORMS += \
+    auth.ui \
     lentelem.ui \
     mainwindow.ui \
+    newlogin.ui \
     newselem.ui \
     qdialogusers.ui \
     sendmessageuser.ui \
